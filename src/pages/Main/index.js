@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-
+import {connect} from 'react-redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {ToastAndroid, Keyboard, ActivityIndicator} from 'react-native';
 import {
@@ -19,7 +19,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import api from '../../services/api';
 import DoubleTap from '~/components/DoubleTap';
 
-export default class Main extends Component {
+class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -111,7 +111,8 @@ export default class Main extends Component {
   };
 
   handleFavorites = async item => {
-    const {favorites, recipes} = this.state;
+    const {recipes} = this.state;
+    const {favorites, dispatch} = this.props;
 
     const isFav = favorites.find(x => {
       return x.id === item.id;
@@ -123,8 +124,9 @@ export default class Main extends Component {
         return f.id !== item.id;
       });
 
-      this.setState({
-        favorites: fav,
+      dispatch({
+        type: 'REMOVE_FAVORITE',
+        fav,
       });
 
       //Muda status de favorito na lista de receitas
@@ -140,8 +142,9 @@ export default class Main extends Component {
         ToastAndroid.BOTTOM,
       );
     } else {
-      this.setState({
-        favorites: [...favorites, item],
+      dispatch({
+        type: 'ADD_FAVORITE',
+        item,
       });
 
       //Muda status de favorito na lista de receitas
@@ -209,3 +212,7 @@ export default class Main extends Component {
     );
   }
 }
+
+export default connect(state => ({
+  favorites: state.favorites,
+}))(Main);

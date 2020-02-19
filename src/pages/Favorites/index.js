@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {ToastAndroid} from 'react-native';
+import {connect} from 'react-redux';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   Container,
@@ -12,7 +13,7 @@ import {
 } from './styles';
 import DoubleTap from '~/components/DoubleTap';
 
-export default class Favorites extends Component {
+class Favorites extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -116,6 +117,10 @@ export default class Favorites extends Component {
     );
   }
 }
+
+export default connect(state => ({
+  favorites: state.favorites,
+}))(Favorites);
 
 Favorites.navigationOptions = {
   title: 'Favoritos',
