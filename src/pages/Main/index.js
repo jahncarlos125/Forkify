@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {ToastAndroid, Keyboard} from 'react-native';
 import {
   Container,
   Form,
@@ -14,6 +15,7 @@ import {
   Publisher,
 } from './styles';
 import api from '../../services/api';
+import DoubleTap from '~/components/DoubleTap';
 
 export default class Main extends Component {
   constructor(props) {
@@ -26,17 +28,23 @@ export default class Main extends Component {
   }
 
   searchRecipes = async () => {
-    const {term} = this.state;
+    const {term, favorites} = this.state;
     try {
       const {data} = await api.get(`/search?q=${term}`);
 
       if (data.count) {
+        console.tron.log(favorites);
         let r = data.recipes.map(item => {
+          const isFav = favorites.find(x => {
+            return x.id === item.recipe_id;
+          });
+
           return {
             id: item.recipe_id,
             title: item.title,
             avatar: item.image_url,
             publisher: item.publisher,
+            favorite: isFav ? true : false,
           };
         });
 
@@ -46,6 +54,60 @@ export default class Main extends Component {
       }
     } catch (error) {
       console.tron.error(error);
+    } finally {
+      Keyboard.dismiss();
+      this.setState({
+        term: '',
+      });
+    }
+  };
+
+  handleFavorites = async item => {
+    const {favorites, recipes} = this.state;
+
+    const isFav = favorites.find(x => {
+      return x.id === item.id;
+    });
+
+    //Se já houver esse favorito ele vai removê-lo
+    if (isFav) {
+      let fav = favorites.filter(f => {
+        return f.id !== item.id;
+      });
+
+      this.setState({
+        favorites: fav,
+      });
+
+      //Muda status de favorito na lista de receitas
+      recipes.map(recipe => {
+        if (recipe.id === item.id) {
+          return (recipe.favorite = false);
+        }
+      });
+
+      ToastAndroid.show(
+        `${item.title} removido!`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
+    } else {
+      this.setState({
+        favorites: [...favorites, item],
+      });
+
+      //Muda status de favorito na lista de receitas
+      recipes.map(recipe => {
+        if (recipe.id === item.id) {
+          return (recipe.favorite = true);
+        }
+      });
+
+      ToastAndroid.show(
+        `${item.title} favoritado!`,
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM,
+      );
     }
   };
 
@@ -69,13 +131,20 @@ export default class Main extends Component {
           data={recipes}
           keyExtractor={item => item.id}
           renderItem={({item}) => (
-            <Recipe>
-              <Avatar source={{uri: item.avatar}} />
-              <InfoContainer>
-                <Title>{item.title}</Title>
-                <Publisher>{item.publisher}</Publisher>
-              </InfoContainer>
-            </Recipe>
+            <DoubleTap onDoubleTap={() => this.handleFavorites(item)}>
+              <Recipe>
+                <Avatar source={{uri: item.avatar}} />
+                <InfoContainer>
+                  <Title>{item.title}</Title>
+                  <Publisher>{item.publisher}</Publisher>
+                </InfoContainer>
+                {item.favorite ? (
+                  <Icon name="favorite" color="#7159c1" size={20} />
+                ) : (
+                  <Icon name="favorite-border" color="#7159c1" size={20} />
+                )}
+              </Recipe>
+            </DoubleTap>
           )}
         />
       </Container>
@@ -86,9 +155,9 @@ export default class Main extends Component {
 Main.navigationOptions = {
   title: 'Forkify - Receitas',
   headerStyle: {
-    backgroundColor: '#FFF',
+    backgroundColor: '#4C3C82',
   },
-  headerTintColor: '#7159c1',
+  headerTintColor: '#FFF',
   headerTitleStyle: {
     fontWeight: 'bold',
   },

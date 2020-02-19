@@ -8,7 +8,7 @@ export const Container = styled.View`
 
 export const Form = styled.View`
   flex-direction: row;
-  padding-bottom: 20px;
+  padding-bottom: 5px;
   border-bottom-width: 1px;
   border-color: #eee;
 `;
@@ -41,6 +41,7 @@ export const List = styled.FlatList.attrs({
 
 export const Recipe = styled.View`
   flex-direction: row;
+  align-items: center;
   background: #eee;
   margin: 8px 0;
   padding: 10px;
@@ -64,7 +65,7 @@ export const InfoContainer = styled.View`
 
 export const Title = styled.Text`
   font-size: 16px;
-  color: #7159c1;
+  color: #4c3c82;
   font-weight: bold;
   margin-top: 5px;
 `;
