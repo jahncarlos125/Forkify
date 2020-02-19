@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {ToastAndroid, Keyboard} from 'react-native';
+import {ToastAndroid, Keyboard, ActivityIndicator} from 'react-native';
 import {
   Container,
   Form,
@@ -13,6 +13,7 @@ import {
   InfoContainer,
   Title,
   Publisher,
+  NoData,
 } from './styles';
 import api from '../../services/api';
 import DoubleTap from '~/components/DoubleTap';
@@ -24,11 +25,32 @@ export default class Main extends Component {
       favorites: [],
       recipes: [],
       term: '',
+      loading: false,
     };
   }
 
+  static navigationOptions = ({navigation}) => {
+    return {
+      title: 'Forkify - Receitas',
+      headerStyle: {
+        backgroundColor: '#4C3C82',
+      },
+      headerTintColor: '#FFF',
+      headerTitleStyle: {
+        fontWeight: '400',
+        fontFamily: 'Roboto',
+      },
+      headerRight: () => (
+        <SubmitButton onPress={() => this.searchRecipes()}>
+          <Icon name="favorite-border" size={20} color="#eee" />
+        </SubmitButton>
+      ),
+    };
+  };
+
   searchRecipes = async () => {
     const {term, favorites} = this.state;
+    this.setState({loading: true});
     try {
       const {data} = await api.get(`/search?q=${term}`);
 
@@ -58,6 +80,7 @@ export default class Main extends Component {
       Keyboard.dismiss();
       this.setState({
         term: '',
+        loading: false,
       });
     }
   };
@@ -112,7 +135,7 @@ export default class Main extends Component {
   };
 
   render() {
-    const {recipes, term} = this.state;
+    const {recipes, term, loading} = this.state;
     return (
       <Container>
         <Form>
@@ -124,41 +147,40 @@ export default class Main extends Component {
             onSubmitEditing={() => this.searchRecipes()}
           />
           <SubmitButton onPress={() => this.searchRecipes()}>
-            <Icon name="search" size={20} color="#eee" />
+            {loading ? (
+              <ActivityIndicator color="#fff" size={20} />
+            ) : (
+              <Icon name="search" size={20} color="#eee" />
+            )}
           </SubmitButton>
         </Form>
-        <List
-          data={recipes}
-          keyExtractor={item => item.id}
-          renderItem={({item}) => (
-            <DoubleTap onDoubleTap={() => this.handleFavorites(item)}>
-              <Recipe>
-                <Avatar source={{uri: item.avatar}} />
-                <InfoContainer>
-                  <Title>{item.title}</Title>
-                  <Publisher>{item.publisher}</Publisher>
-                </InfoContainer>
-                {item.favorite ? (
-                  <Icon name="favorite" color="#7159c1" size={20} />
-                ) : (
-                  <Icon name="favorite-border" color="#7159c1" size={20} />
-                )}
-              </Recipe>
-            </DoubleTap>
-          )}
-        />
+        {recipes.length ? (
+          <List
+            data={recipes}
+            keyExtractor={item => item.id}
+            renderItem={({item}) => (
+              <DoubleTap onDoubleTap={() => this.handleFavorites(item)}>
+                <Recipe>
+                  <Avatar source={{uri: item.avatar}} />
+                  <InfoContainer>
+                    <Title>{item.title}</Title>
+                    <Publisher>{item.publisher}</Publisher>
+                  </InfoContainer>
+                  {item.favorite ? (
+                    <Icon name="favorite" color="#7159c1" size={20} />
+                  ) : (
+                    <Icon name="favorite-border" color="#7159c1" size={20} />
+                  )}
+                </Recipe>
+              </DoubleTap>
+            )}
+          />
+        ) : (
+          <NoData>
+            <Title>Sem dados!</Title>
+          </NoData>
+        )}
       </Container>
     );
   }
 }
-
-Main.navigationOptions = {
-  title: 'Forkify - Receitas',
-  headerStyle: {
-    backgroundColor: '#4C3C82',
-  },
-  headerTintColor: '#FFF',
-  headerTitleStyle: {
-    fontWeight: 'bold',
-  },
-};

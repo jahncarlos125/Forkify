@@ -27,7 +27,7 @@ export const Input = styled.TextInput.attrs({
 export const SubmitButton = styled(RectButton)`
   justify-content: center;
   align-items: center;
-  background: #7159c1;
+  background: #4c3c82;
   border-radius: 40px;
   margin-left: 10px;
   padding: 0 12px;
@@ -61,6 +61,12 @@ export const InfoContainer = styled.View`
   flex: 4;
   justify-content: center;
   align-items: flex-start;
+`;
+
+export const NoData = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
 `;
 
 export const Title = styled.Text`
