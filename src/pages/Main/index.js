@@ -46,6 +46,7 @@ export default class Main extends Component {
 
     if (fav) {
       this.setState({
+        recipes: [],
         favorites: JSON.parse(fav),
       });
     }
@@ -63,7 +64,10 @@ export default class Main extends Component {
         fontFamily: 'Roboto',
       },
       headerRight: () => (
-        <SubmitButton onPress={() => {}}>
+        <SubmitButton
+          onPress={() => {
+            navigation.navigate('Favorites');
+          }}>
           <Icon name="favorite-border" size={20} color="#eee" />
         </SubmitButton>
       ),
