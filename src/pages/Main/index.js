@@ -15,6 +15,7 @@ import {
   Publisher,
   NoData,
 } from './styles';
+import AsyncStorage from '@react-native-community/async-storage';
 import api from '../../services/api';
 import DoubleTap from '~/components/DoubleTap';
 
@@ -29,6 +30,27 @@ export default class Main extends Component {
     };
   }
 
+  async componentDidMount() {
+    await this.loadFavorites();
+  }
+
+  async componentDidUpdate(_, prevState) {
+    const {favorites} = this.state;
+    if (prevState !== favorites) {
+      await AsyncStorage.setItem('@fork:key', JSON.stringify(favorites));
+    }
+  }
+
+  async loadFavorites() {
+    const fav = await AsyncStorage.getItem('@fork:key');
+
+    if (fav) {
+      this.setState({
+        favorites: JSON.parse(fav),
+      });
+    }
+  }
+
   static navigationOptions = ({navigation}) => {
     return {
       title: 'Forkify - Receitas',
@@ -41,7 +63,7 @@ export default class Main extends Component {
         fontFamily: 'Roboto',
       },
       headerRight: () => (
-        <SubmitButton onPress={() => this.searchRecipes()}>
+        <SubmitButton onPress={() => {}}>
           <Icon name="favorite-border" size={20} color="#eee" />
         </SubmitButton>
       ),
@@ -55,7 +77,6 @@ export default class Main extends Component {
       const {data} = await api.get(`/search?q=${term}`);
 
       if (data.count) {
-        console.tron.log(favorites);
         let r = data.recipes.map(item => {
           const isFav = favorites.find(x => {
             return x.id === item.recipe_id;
