@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {ToastAndroid, Keyboard, ActivityIndicator} from 'react-native';
 import {
@@ -15,7 +16,8 @@ import {
   Publisher,
   NoData,
 } from './styles';
-import AsyncStorage from '@react-native-community/async-storage';
+import * as FavActions from '../../store/modules/favorites/actions';
+import * as RecipeActions from '../../store/modules/recipes/actions';
 import api from '../../services/api';
 import DoubleTap from '~/components/DoubleTap';
 
@@ -28,28 +30,6 @@ class Main extends Component {
       term: '',
       loading: false,
     };
-  }
-
-  async componentDidMount() {
-    await this.loadFavorites();
-  }
-
-  async componentDidUpdate(_, prevState) {
-    const {favorites} = this.state;
-    if (prevState !== favorites) {
-      await AsyncStorage.setItem('@fork:key', JSON.stringify(favorites));
-    }
-  }
-
-  async loadFavorites() {
-    const fav = await AsyncStorage.getItem('@fork:key');
-
-    if (fav) {
-      this.setState({
-        recipes: [],
-        favorites: JSON.parse(fav),
-      });
-    }
   }
 
   static navigationOptions = ({navigation}) => {
@@ -75,30 +55,13 @@ class Main extends Component {
   };
 
   searchRecipes = async () => {
-    const {term, favorites} = this.state;
+    const {term} = this.state;
+    console.tron.log(term);
+    console.tron.log(this.props);
+    const {loadRecipesRequest} = this.props;
     this.setState({loading: true});
     try {
-      const {data} = await api.get(`/search?q=${term}`);
-
-      if (data.count) {
-        let r = data.recipes.map(item => {
-          const isFav = favorites.find(x => {
-            return x.id === item.recipe_id;
-          });
-
-          return {
-            id: item.recipe_id,
-            title: item.title,
-            avatar: item.image_url,
-            publisher: item.publisher,
-            favorite: isFav ? true : false,
-          };
-        });
-
-        this.setState({
-          recipes: r,
-        });
-      }
+      await loadRecipesRequest(term);
     } catch (error) {
       console.tron.error(error);
     } finally {
@@ -112,7 +75,7 @@ class Main extends Component {
 
   handleFavorites = async item => {
     const {recipes} = this.state;
-    const {favorites, dispatch} = this.props;
+    const {favorites, addFavorite, removeFavorite} = this.props;
 
     const isFav = favorites.find(x => {
       return x.id === item.id;
@@ -124,10 +87,7 @@ class Main extends Component {
         return f.id !== item.id;
       });
 
-      dispatch({
-        type: 'REMOVE_FAVORITE',
-        fav,
-      });
+      removeFavorite(fav);
 
       //Muda status de favorito na lista de receitas
       recipes.map(recipe => {
@@ -142,10 +102,7 @@ class Main extends Component {
         ToastAndroid.BOTTOM,
       );
     } else {
-      dispatch({
-        type: 'ADD_FAVORITE',
-        item,
-      });
+      addFavorite(item);
 
       //Muda status de favorito na lista de receitas
       recipes.map(recipe => {
@@ -163,7 +120,8 @@ class Main extends Component {
   };
 
   render() {
-    const {recipes, term, loading} = this.state;
+    const {term, loading} = this.state;
+    const {recipes} = this.props;
     return (
       <Container>
         <Form>
@@ -213,6 +171,15 @@ class Main extends Component {
   }
 }
 
-export default connect(state => ({
+const mapStateToProps = state => ({
   favorites: state.favorites,
-}))(Main);
+  recipes: state.recipes,
+});
+
+const mapDispatchToProps = dispatch =>
+  bindActionCreators({...FavActions, ...RecipeActions}, dispatch);
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(Main);

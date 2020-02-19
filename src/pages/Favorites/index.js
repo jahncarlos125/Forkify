@@ -24,29 +24,9 @@ class Favorites extends Component {
     };
   }
 
-  async componentDidMount() {
-    await this.loadFavorites();
-  }
-
-  async componentDidUpdate(_, prevState) {
-    const {favorites} = this.state;
-    if (prevState !== favorites) {
-      await AsyncStorage.setItem('@fork:key', JSON.stringify(favorites));
-    }
-  }
-
-  async loadFavorites() {
-    const fav = await AsyncStorage.getItem('@fork:key');
-
-    if (fav) {
-      this.setState({
-        favorites: JSON.parse(fav),
-      });
-    }
-  }
-
   handleFavorites = async item => {
-    const {favorites, recipes} = this.state;
+    const {recipes} = this.state;
+    const {favorites, dispatch} = this.props;
 
     const isFav = favorites.find(x => {
       return x.id === item.id;
@@ -58,8 +38,9 @@ class Favorites extends Component {
         return f.id !== item.id;
       });
 
-      this.setState({
-        favorites: fav,
+      dispatch({
+        type: 'REMOVE_FAVORITE',
+        fav,
       });
 
       //Muda status de favorito na lista de receitas
@@ -75,8 +56,9 @@ class Favorites extends Component {
         ToastAndroid.BOTTOM,
       );
     } else {
-      this.setState({
-        favorites: [...favorites, item],
+      dispatch({
+        type: 'ADD_FAVORITE',
+        item,
       });
 
       //Muda status de favorito na lista de receitas
@@ -95,7 +77,7 @@ class Favorites extends Component {
   };
 
   render() {
-    const {favorites} = this.state;
+    const {favorites} = this.props;
     return (
       <Container>
         <List
