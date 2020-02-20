@@ -5,6 +5,13 @@ export function loadRecipesRequest(term) {
   };
 }
 
+export function updateRecipe(item) {
+  return {
+    type: '@recipe/UPDATE',
+    item,
+  };
+}
+
 export function loadRecipesSuccess(recipes) {
   return {
     type: '@recipe/LOAD_SUCCESS',

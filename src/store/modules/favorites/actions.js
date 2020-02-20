@@ -1,13 +1,27 @@
-export function addFavorite(item) {
+export function addFavoriteRequest(item) {
   return {
-    type: '@fav/ADD',
+    type: '@fav/ADD_REQUEST',
     item,
   };
 }
 
-export function removeFavorite(fav) {
+export function addFavoriteSuccess(item) {
   return {
-    type: '@fav/REMOVE',
-    fav,
+    type: '@fav/ADD_SUCCESS',
+    item,
+  };
+}
+
+export function removeFavoriteRequest(item) {
+  return {
+    type: '@fav/REMOVE_REQUEST',
+    item,
+  };
+}
+
+export function removeFavoriteSuccess(item) {
+  return {
+    type: '@fav/REMOVE_SUCCESS',
+    item,
   };
 }

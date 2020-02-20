@@ -22,6 +22,8 @@ function* fetchData({term}) {
       };
     });
 
+    console.tron.log('r', r);
+
     yield put(loadRecipesSuccess(r));
   }
 }
