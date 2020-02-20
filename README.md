@@ -40,6 +40,11 @@ Abaixo segue o que foi utilizado na criação deste template:
   - [eslint-config-prettier](https://github.com/prettier/eslint-config-prettier) - Desativa todas as regras que são desnecessárias ou que podem dar conflito com o Prettier;
 - [EditorConfig](https://editorconfig.org/) - O EditorConfig é um formatador de arquivos e coleções em forma de Plugin para Editores de código/texto com o objetivo de manter um padrão de código consistente entre diferentes editores, IDE's ou ambientes;
 
+## Executar
+
+basta rodar `react-native run-android`
+
+
 <!-- CONTACT -->
 
 ## Contato
