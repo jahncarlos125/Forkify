@@ -1,6 +1,6 @@
 import {call, put, select, all, takeLatest} from 'redux-saga/effects';
 import api from '../../../services/api';
-import {loadRecipesSuccess} from './actions';
+import {loadRecipesSuccess, loadRecipesFailed} from './actions';
 import {addLoading, removeLoading} from '../globals/actions';
 
 function* fetchData({term}) {
@@ -19,18 +19,16 @@ function* fetchData({term}) {
         return {
           id: item.recipe_id,
           title: item.title,
-          avatar: item.image_url,
+          avatar: item.image_url.replace('http', 'https'),
           publisher: item.publisher,
           favorite: isFav ? true : false,
         };
       });
 
-      console.tron.log('r', r);
-
       yield put(loadRecipesSuccess(r));
     }
   } catch (error) {
-    console.tron.log(error);
+    yield put(loadRecipesFailed(error.message));
   } finally {
     yield put(removeLoading());
   }

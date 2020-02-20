@@ -4,7 +4,7 @@ import {updateRecipe} from '../recipes/actions';
 
 function* addFavorite({item}) {
   const getRecipes = state => state.recipes;
-  const recipes = yield select(getRecipes);
+  const {recipes} = yield select(getRecipes);
 
   //Muda status de favorito na lista de receitas
   let recipe_id = recipes.findIndex(r => r.id === item.id);
@@ -24,7 +24,7 @@ function* addFavorite({item}) {
 
 function* removeFavorite({item}) {
   const getRecipes = state => state.recipes;
-  const recipes = yield select(getRecipes);
+  const {recipes} = yield select(getRecipes);
 
   //Muda status de favorito na lista de receitas
   let recipe_id = recipes.findIndex(r => r.id === item.id);

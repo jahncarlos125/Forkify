@@ -12,6 +12,12 @@ export function updateRecipe(item) {
   };
 }
 
+export function loadRecipesFailed(error) {
+  return {
+    type: '@recipe/LOAD_FAILED',
+    error,
+  };
+}
 export function loadRecipesSuccess(recipes) {
   return {
     type: '@recipe/LOAD_SUCCESS',

@@ -52,3 +52,10 @@ export const Title = styled.Text`
   font-weight: bold;
   margin-top: 5px;
 `;
+
+export const Error = styled.Text`
+  font-size: 14px;
+  color: #831d1c;
+  font-weight: bold;
+  margin-top: 5px;
+`;

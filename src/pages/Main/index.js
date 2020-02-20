@@ -11,6 +11,7 @@ import {
   List,
   Title,
   NoData,
+  Error,
 } from './styles';
 import * as FavActions from '../../store/modules/favorites/actions';
 import * as RecipeActions from '../../store/modules/recipes/actions';
@@ -52,18 +53,13 @@ class Main extends Component {
   searchRecipes = async () => {
     const {term} = this.state;
     const {loadRecipesRequest} = this.props;
-    this.setState({loading: true});
-    try {
-      await loadRecipesRequest(term);
-    } catch (error) {
-      console.tron.error(error);
-    } finally {
-      Keyboard.dismiss();
-      this.setState({
-        term: '',
-        loading: false,
-      });
-    }
+
+    await loadRecipesRequest(term);
+
+    Keyboard.dismiss();
+    this.setState({
+      term: '',
+    });
   };
 
   render() {
@@ -87,15 +83,19 @@ class Main extends Component {
             )}
           </SubmitButton>
         </Form>
-        {recipes.length ? (
+        {recipes.recipes.length ? (
           <List
-            data={recipes}
+            data={recipes.recipes}
             keyExtractor={item => item.id}
             renderItem={({item}) => <RecipeComponent item={item} />}
           />
         ) : (
           <NoData>
-            <Title>Sem dados!</Title>
+            {recipes.error ? (
+              <Error>{recipes.error}</Error>
+            ) : (
+              <Title>Sem dados!</Title>
+            )}
           </NoData>
         )}
       </Container>

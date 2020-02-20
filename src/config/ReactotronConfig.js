@@ -3,9 +3,8 @@ import {reactotronRedux} from 'reactotron-redux';
 import sagaPlugin from 'reactotron-redux-saga';
 import {MY_IP} from 'react-native-dotenv';
 
-let tron;
 if (__DEV__) {
-  tron = Reactotron.configure({host: MY_IP})
+  const tron = Reactotron.configure({host: MY_IP})
     .use(reactotronRedux())
     .use(sagaPlugin())
     .useReactNative()
@@ -15,5 +14,3 @@ if (__DEV__) {
 
   console.tron = tron;
 }
-
-export default tron;
