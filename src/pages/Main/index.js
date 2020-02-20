@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {ToastAndroid, Keyboard, ActivityIndicator} from 'react-native';
+import {Keyboard, ActivityIndicator} from 'react-native';
 import {
   Container,
   Form,
@@ -67,8 +67,8 @@ class Main extends Component {
   };
 
   render() {
-    const {term, loading} = this.state;
-    const {recipes} = this.props;
+    const {term} = this.state;
+    const {recipes, globals} = this.props;
     return (
       <Container>
         <Form>
@@ -80,7 +80,7 @@ class Main extends Component {
             onSubmitEditing={() => this.searchRecipes()}
           />
           <SubmitButton onPress={() => this.searchRecipes()}>
-            {loading ? (
+            {globals.loading ? (
               <ActivityIndicator color="#fff" size={20} />
             ) : (
               <Icon name="search" size={20} color="#eee" />
@@ -106,6 +106,7 @@ class Main extends Component {
 const mapStateToProps = state => ({
   favorites: state.favorites,
   recipes: state.recipes,
+  globals: state.globals,
 });
 
 const mapDispatchToProps = dispatch =>
